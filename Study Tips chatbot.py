@@ -1,5 +1,6 @@
 import streamlit as st
 import nltk
+from nltk import sent_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import re
@@ -9,10 +10,23 @@ nltk.download('punkt')
 
 # Function to preprocess the text
 def preprocess(text):
-    text = re.sub(r'\r\n', ' ', text)  # Replace newline characters with space
-    text = re.sub(r'\s+', ' ', text)  # Remove multiple spaces
-    sentences = nltk.sent_tokenize(text)
-    sentences = [re.sub(r'[^a-zA-Z0-9\s]', '', sentence) for sentence in sentences]
+    """
+    This function processes the raw text by:
+    - Removing unnecessary newlines and extra spaces.
+    - Tokenizing the text into sentences.
+    - Cleaning each sentence by removing unnecessary characters, including `*`.
+    """
+    # Remove newline characters and extra spaces
+    text = re.sub(r'\r\n', ' ', text)  # Replace newlines with space
+    text = re.sub(r'\s+', ' ', text)  # Replace multiple spaces with a single space
+
+    # Remove the `*` symbols and any other non-alphanumeric characters except for punctuation
+    text = re.sub(r'\*', '', text)  # Remove star symbols
+    text = re.sub(r'[^a-zA-Z0-9\s.,?!]', '', text)  # Remove other unwanted characters
+
+    # Tokenize the text into sentences
+    sentences = sent_tokenize(text)
+
     return sentences
 
 # Function to compute the most relevant sentence
